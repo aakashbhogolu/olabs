@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+ 
+    <title>VACTS</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background: #222; color: white; }
+        canvas { background: black; display: block; margin: 20px auto; }
+        .puzzle-container { display: none; text-align: center; }
+        .puzzle-grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; margin: 20px auto; }
+        .puzzle-grid img { width: 100px; height: 100px; cursor: pointer; border: 1px solid #fff; }
+    </style>
+</head>
+<body>
+    <h1>Snake Game</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    
+    <div class="puzzle-container" id="puzzleContainer">
+        <h2>Picture Puzzle</h2>
+        <div class="puzzle-grid" id="puzzleGrid"></div>
+        <button onclick="resumeGame()">Resume Game</button>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const tileSize = 20;
+        let snake = [{ x: 200, y: 200 }];
+        let dx = tileSize, dy = 0;
+        let gamePaused = false;
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp") { dx = 0; dy = -tileSize; }
+            else if (e.key === "ArrowDown") { dx = 0; dy = tileSize; }
+            else if (e.key === "ArrowLeft") { dx = -tileSize; dy = 0; }
+            else if (e.key === "ArrowRight") { dx = tileSize; dy = 0; }
+        });
+
+        function update() {
+            if (gamePaused) return;
+            let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                openPuzzle();
+                return;
+            }
+            snake.unshift(head);
+            snake.pop();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "green";
+            snake.forEach(segment => ctx.fillRect(segment.x, segment.y, tileSize, tileSize));
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            setTimeout(gameLoop, 100);
+        }
+        gameLoop();
+
+        function openPuzzle() {
+            gamePaused = true;
+            document.getElementById("puzzleContainer").style.display = "block";
+            generatePuzzle();
+        }
+
+        function resumeGame() {
+            gamePaused = false;
+            document.getElementById("puzzleContainer").style.display = "none";
+        }
+
+        function generatePuzzle() {
+            const puzzleGrid = document.getElementById("puzzleGrid");
+            puzzleGrid.innerHTML = "";
+            let images = ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg"];
+            images.sort(() => Math.random() - 0.5);
+            images.forEach((src, index) => {
+                let img = document.createElement("img");
+                img.src = `puzzle/${src}`;
+                img.dataset.index = index;
+                img.onclick = () => swapTiles(img);
+                puzzleGrid.appendChild(img);
+            });
+        }
+    </script>
+</body>
+</html>

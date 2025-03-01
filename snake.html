@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game & Puzzle</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background: #222; color: white; }
+        canvas { background: black; display: block; margin: 20px auto; }
+        .puzzle-container { display: none; text-align: center; }
+        .puzzle-grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; margin: 20px auto; }
+        .puzzle-grid img { width: 100px; height: 100px; cursor: pointer; border: 1px solid #fff; }
+    </style>
+</head>
+<body>
+    <h1>Snake Game</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    
+    <div class="puzzle-container" id="puzzleContainer">
+        <h2>Picture Puzzle</h2>
+        <div class="puzzle-grid" id="puzzleGrid"></div>
+        <button onclick="resumeGame()">Resume Game</button>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const tileSize = 20;
+        let snake = [{ x: 200, y: 200 }];
+        let dx = tileSize, dy = 0;
+        let gamePaused = false;
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp") { dx = 0; dy = -tileSize; }
+            else if (e.key === "ArrowDown") { dx = 0; dy = tileSize; }
+            else if (e.key === "ArrowLeft") { dx = -tileSize; dy = 0; }
+            else if (e.key === "ArrowRight") { dx = tileSize; dy = 0; }
+        });
+
+        function update() {
+            if (gamePaused) return;
+            let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                window.location.href = "puzzle.html"; // Redirect to puzzle game after snake game ends
+                return;
+            }
+            snake.unshift(head);
+            snake.pop();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "green";
+            snake.forEach(segment => ctx.fillRect(segment.x, segment.y, tileSize, tileSize));
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            setTimeout(gameLoop, 100);
+        }
+        gameLoop();
+    </script>
+</body>
+</html>

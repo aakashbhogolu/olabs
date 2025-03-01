@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jigsaw Puzzle</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background: #222; color: white; }
+        .puzzle-container { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; margin: 50px auto; width: 320px; }
+        .puzzle-container img { width: 100px; height: 100px; cursor: pointer; border: 2px solid white; }
+        button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Jigsaw Puzzle</h1>
+    <div class="puzzle-container" id="puzzleGrid"></div>
+    <button onclick="checkWin()">Check Solution</button>
+
+   <script>
+    const puzzleGrid = document.getElementById("puzzleGrid");
+    const correctOrder = ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg", "9.jpg"];
+    let images = [...correctOrder]; // Create a copy of the correct order
+    images.sort(() => Math.random() - 0.5); // Shuffle the images
+
+    images.forEach((src, index) => {
+        let img = document.createElement("img");
+        img.src = src;
+        img.dataset.index = index;
+        img.onclick = () => swapTiles(img);
+        puzzleGrid.appendChild(img);
+    });
+
+    let firstClick = null;
+    function swapTiles(img) {
+        if (!firstClick) {
+            firstClick = img;
+        } else {
+            // Swap the images
+            let tempSrc = firstClick.src;
+            firstClick.src = img.src;
+            img.src = tempSrc;
+            firstClick = null;
+        }
+    }
+
+    function checkWin() {
+        let allImages = document.querySelectorAll(".puzzle-container img");
+        let currentOrder = Array.from(allImages).map(img => img.src.split("/").pop());
+        if (currentOrder.join("") === correctOrder.join("")) {
+            alert("Congratulations! Puzzle Solved!");
+            window.location.href = "code1.html"; // Redirect to Snake Game
+        } else {
+            alert("Not solved yet, keep trying!");
+        }
+    }
+</script>
+
+</body>
+</html>
